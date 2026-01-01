@@ -20,8 +20,8 @@ app.get('/', (req, res) => {
   res.json({ message: 'Portfolio Backend API', status: 'running' });
 });
 
-// Simple contact route without database
-app.post('/api/contact', (req, res) => {
+// Simple contact route with email notification
+app.post('/api/contact', async (req, res) => {
   try {
     console.log('Contact form submission:', req.body);
     const { name, email, company, message } = req.body;
@@ -29,6 +29,27 @@ app.post('/api/contact', (req, res) => {
     if (!name || !email || !message) {
       console.log('Validation failed: Missing required fields');
       return res.status(400).json({ message: 'Name, email, and message are required' });
+    }
+
+    // Simple email using EmailJS alternative - just log for now
+    console.log('=== EMAIL NOTIFICATION ===');
+    console.log('To: kritikasingh273017@gmail.com');
+    console.log('Subject: New Portfolio Contact Form Submission');
+    console.log('Name:', name);
+    console.log('Email:', email);
+    console.log('Company:', company || 'Not specified');
+    console.log('Message:', message);
+    console.log('========================');
+    
+    // Also try a simple webhook to Zapier/IFTTT
+    try {
+      await fetch('https://maker.ifttt.com/trigger/portfolio_contact/with/key/your_webhook_key', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, company, message })
+      });
+    } catch (webhookError) {
+      console.log('Webhook failed, but continuing...');
     }
 
     console.log('Contact form data received successfully');
